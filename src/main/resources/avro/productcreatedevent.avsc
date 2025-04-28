@@ -1,0 +1,43 @@
+{
+  "namespace": "com.banreservas.product.avro.v1",
+  "type": "record",
+  "name": "ProductCreatedEventV1",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "price",
+      "type": "double"
+    },
+    {
+      "name": "category",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "sku",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
+}
