@@ -32,4 +32,17 @@ public class ProductServiceImpl implements ProductService {
     public Mono<Product> getOne(String id) {
         return productRepository.findById(id);
     }
+
+    @Override
+    public Mono<Product> updateProduct(Product dbProduct, Product newProductChanges) {
+
+        dbProduct.setName(newProductChanges.getName());
+        dbProduct.setPrice(newProductChanges.getPrice());
+        dbProduct.setDescription(newProductChanges.getDescription());
+        dbProduct.setCategory(newProductChanges.getCategory());
+        dbProduct.setSku(newProductChanges.getSku());
+
+        return productRepository.save(dbProduct)
+                .flatMap(productEventPublishService::sendProductUpdatedEvent);
+    }
 }

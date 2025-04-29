@@ -12,4 +12,5 @@ public interface ProductService {
 
     Mono<Product> getOne(String id);
 
+    Mono<Product> updateProduct(Product dbProduct, Product newProductChanges);
 }

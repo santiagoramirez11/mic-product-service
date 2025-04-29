@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 public interface ProductEventPublishService {
 
     Mono<Product> sendProductCreatedEvent(Product product);
+
+    Mono<Product> sendProductUpdatedEvent(Product product);
 }

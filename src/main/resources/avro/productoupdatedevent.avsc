@@ -1,7 +1,7 @@
 {
   "namespace": "com.banreservas.product.avro.v1",
   "type": "record",
-  "name": "ProductCreatedEventV1",
+  "name": "ProductUpdatedEventV1",
   "fields": [
     {
       "name": "id",
