@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Product Service Microservice
+  version: 1.0.0
+  description: Product APIs for managing products.
+
+servers:
+  - url: http://localhost:8080/api/v1
+
+paths:
+  /products:
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Request contains incorrect syntax or cannot be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                title: "invalid-request"
+                detail: "Invalid values sent in the request"
+
+components:
+  schemas:
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - category
+        - sku
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        category:
+          type: string
+        sku:
+          type: string
+          nullable: true
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        category:
+          type: string
+        sku:
+          type: string
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - title
+        - detail
+      properties:
+        code:
+          description: "A number that represents a type of errors, grouping those of similar characteristics"
+          type: integer
+        title:
+          description: "A identifier for the error code"
+          type: string
+        detail:
+          description: "A description of the error"
+          type: string

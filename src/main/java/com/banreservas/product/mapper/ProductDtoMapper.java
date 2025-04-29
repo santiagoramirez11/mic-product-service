@@ -1,6 +1,7 @@
 package com.banreservas.product.mapper;
 
-import com.banreservas.product.dto.ProductDto;
+import com.banreservas.openapi.models.ProductRequestDto;
+import com.banreservas.openapi.models.ProductResponseDto;
 import com.banreservas.product.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,8 +11,8 @@ public interface ProductDtoMapper {
 
     ProductDtoMapper INSTANCE = Mappers.getMapper(ProductDtoMapper.class);
 
-    ProductDto toProductDto(Product product);
+    ProductResponseDto toProductDto(Product product);
 
-    Product toProduct(ProductDto productDto);
+    Product toProduct(ProductRequestDto productDto);
 
 }
