@@ -1,5 +1,6 @@
 package com.banreservas.product.controller;
 
+import com.banreservas.openapi.controllers.ProductsApi;
 import com.banreservas.openapi.models.ProductRequestDto;
 import com.banreservas.openapi.models.ProductResponseDto;
 import com.banreservas.product.constant.Endpoint;
@@ -22,7 +23,7 @@ import static com.banreservas.product.mapper.ProductDtoMapper.MAPPER;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(Endpoint.API_BASE)
-public class ProductController implements com.banreservas.openapi.controllers.ProductsApi {
+public class ProductController implements ProductsApi {
 
     private final ProductService productService;
 
