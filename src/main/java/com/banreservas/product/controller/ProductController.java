@@ -32,4 +32,9 @@ public class ProductController implements com.banreservas.openapi.controllers.Pr
                 .map(ProductDtoMapper.INSTANCE::toProductDto)
                 .map(ResponseEntity.status(HttpStatus.CREATED)::body);
     }
+
+    @Override
+    public Mono<ResponseEntity<ProductResponseDto>> updateProduct(String id, Mono<ProductRequestDto> productRequestDto, ServerWebExchange exchange) {
+        return null;
+    }
 }

@@ -37,6 +37,51 @@ paths:
                 code: 400
                 title: "invalid-request"
                 detail: "Invalid values sent in the request"
+  /products/{id}:
+    patch:
+      summary: Update an existing product
+      operationId: updateProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product update successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Request contains incorrect syntax or cannot be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                title: "invalid-request"
+                detail: "Invalid values sent in the request"
+        '404':
+          description: The specified product resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                title: "resource-not-found"
+                detail: "The resource can't be found"
 
 components:
   schemas:
