@@ -7,9 +7,13 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface ProductEventMapper {
 
-    ProductEventMapper INSTANCE = Mappers.getMapper(ProductEventMapper.class);
+    ProductEventMapper PRODUCT_EVENT_MAPPER = Mappers.getMapper(ProductEventMapper.class);
 
-    com.banreservas.product.avro.v1.ProductCreatedEventV1 toEvent(Product product);
+    com.banreservas.product.avro.v1.ProductCreatedEventV1 toCreatedEvent(Product product);
 
     Product toProduct(com.banreservas.product.avro.v1.ProductCreatedEventV1 event);
+
+    com.banreservas.product.avro.v1.ProductUpdatedEventV1 toUpdatedEvent(Product product);
+
+    Product toProduct(com.banreservas.product.avro.v1.ProductUpdatedEventV1 event);
 }
