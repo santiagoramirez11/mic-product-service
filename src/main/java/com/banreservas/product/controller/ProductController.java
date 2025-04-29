@@ -23,6 +23,11 @@ public class ProductController implements com.banreservas.openapi.controllers.Pr
     private final ProductService productService;
 
     @Override
+    public Mono<ResponseEntity<ProductResponseDto>> getProduct(String id, String currency, ServerWebExchange exchange) {
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
     public Mono<ResponseEntity<ProductResponseDto>> createProduct(Mono<ProductRequestDto> productRequestDto, ServerWebExchange exchange) {
         return productRequestDto
                 .map(ProductDtoMapper.INSTANCE::toProduct)
@@ -35,6 +40,11 @@ public class ProductController implements com.banreservas.openapi.controllers.Pr
 
     @Override
     public Mono<ResponseEntity<ProductResponseDto>> updateProduct(String id, Mono<ProductRequestDto> productRequestDto, ServerWebExchange exchange) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> deleteProduct(String id, ServerWebExchange exchange) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 }
