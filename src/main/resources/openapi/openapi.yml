@@ -1,0 +1,223 @@
+openapi: 3.0.3
+info:
+  title: Product Service Microservice
+  version: 1.0.0
+  description: Product APIs for managing products.
+
+servers:
+  - url: http://localhost:8080/api/v1
+
+paths:
+  /products:
+    get:
+      summary: List all products
+      operationId: listProducts
+      tags:
+        - Products
+      parameters:
+        - in: query
+          name: currency
+          schema:
+            type: string
+          required: false
+          description: Currency code to convert product price (example DOP, EUR, USD)
+      responses:
+        '200':
+          description: List of products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Request contains incorrect syntax or cannot be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                title: "invalid-request"
+                detail: "Invalid values sent in the request"
+  /products/{id}:
+    get:
+      summary: Retrieve a product by ID
+      operationId: getProduct
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Product unique identifier
+        - in: query
+          name: currency
+          schema:
+            type: string
+          required: false
+          description: Currency code to convert product price (example DOP, EUR, USD)
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: The specified product was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                title: "resource-not-found"
+                detail: "The resource can't be found"
+    patch:
+      summary: Update an existing product
+      operationId: updateProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Product update successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Request contains incorrect syntax or cannot be processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                title: "invalid-request"
+                detail: "Invalid values sent in the request"
+        '404':
+          description: The specified product was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                title: "resource-not-found"
+                detail: "The resource can't be found"
+    delete:
+      summary: Delete a product
+      operationId: deleteProduct
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted successfully
+        '404':
+          description: The specified product was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                title: "resource-not-found"
+                detail: "The resource can't be found"
+components:
+  schemas:
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - category
+        - sku
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        category:
+          type: string
+        sku:
+          type: string
+          nullable: true
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        category:
+          type: string
+        sku:
+          type: string
+          nullable: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - title
+        - detail
+      properties:
+        code:
+          description: "A number that represents a type of errors, grouping those of similar characteristics"
+          type: integer
+        title:
+          description: "A identifier for the error code"
+          type: string
+        detail:
+          description: "A description of the error"
+          type: string

@@ -31,6 +31,8 @@
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <org.apache.avro.version>1.11.4</org.apache.avro.version>
         <io.confluent.version>7.4.0</io.confluent.version>
+        <swagger-annotations.version>2.2.30</swagger-annotations.version>
+        <openapi-generator-plugin.version>7.12.0</openapi-generator-plugin.version>
     </properties>
     <repositories>
         <repository>
@@ -68,6 +70,12 @@
                     <artifactId>zookeeper</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger-annotations.version}</version>
         </dependency>
 
         <dependency>
@@ -148,6 +156,40 @@
                             </sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/avro/
                             </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>src/main/resources/openapi/openapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <packageName>${project.groupId}</packageName>
+                            <apiPackage>${project.groupId}.openapi.controllers</apiPackage>
+                            <modelPackage>${project.groupId}.openapi.models</modelPackage>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <modelNameSuffix>Dto</modelNameSuffix>
+                            <library>spring-boot</library>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <configOptions>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <sourceFolder>src/main/java</sourceFolder>
+                                <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <interfaceOnly>true</interfaceOnly>
+                                <reactive>true</reactive>
+                                <useTags>true</useTags>
+                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>
