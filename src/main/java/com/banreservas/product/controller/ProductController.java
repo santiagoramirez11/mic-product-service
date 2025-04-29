@@ -30,8 +30,8 @@ public class ProductController implements com.banreservas.openapi.controllers.Pr
     }
 
     @Override
-    public Mono<ResponseEntity<ProductResponseDto>> createProduct(Mono<ProductRequestDto> productRequestDto, ServerWebExchange exchange) {
-        return productRequestDto
+    public Mono<ResponseEntity<ProductResponseDto>> createProduct(ProductRequestDto productRequestDto, ServerWebExchange exchange) {
+        return Mono.just(productRequestDto)
                 .map(ProductDtoMapper.INSTANCE::toProduct)
                 .doOnNext(info -> log.trace("Receive Product [{}]", info))
                 .flatMap(productService::createProduct)
@@ -46,7 +46,7 @@ public class ProductController implements com.banreservas.openapi.controllers.Pr
     }
 
     @Override
-    public Mono<ResponseEntity<ProductResponseDto>> updateProduct(String id, Mono<ProductRequestDto> productRequestDto, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<ProductResponseDto>> updateProduct(String id, ProductRequestDto productRequestDto, ServerWebExchange exchange) {
         throw new ProductNotFoundException(id);
     }
 
