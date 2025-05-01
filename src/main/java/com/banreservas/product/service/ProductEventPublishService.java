@@ -8,4 +8,6 @@ public interface ProductEventPublishService {
     Mono<Product> sendProductCreatedEvent(Product product);
 
     Mono<Product> sendProductUpdatedEvent(Product product);
+
+    Mono<Void> sendProductDeletedEvent(Product product);
 }

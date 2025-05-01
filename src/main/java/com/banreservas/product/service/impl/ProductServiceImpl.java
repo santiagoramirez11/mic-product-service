@@ -45,4 +45,10 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(dbProduct)
                 .flatMap(productEventPublishService::sendProductUpdatedEvent);
     }
+
+    @Override
+    public Mono<Void> deleteProduct(Product product) {
+        return productRepository.delete(product)
+                .then(productEventPublishService.sendProductDeletedEvent(product));
+    }
 }

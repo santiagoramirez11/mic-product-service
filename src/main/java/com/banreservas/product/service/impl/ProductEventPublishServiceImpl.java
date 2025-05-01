@@ -1,6 +1,7 @@
 package com.banreservas.product.service.impl;
 
 import com.banreservas.product.avro.v1.ProductCreatedEventV1;
+import com.banreservas.product.avro.v1.ProductDeletedEventV1;
 import com.banreservas.product.avro.v1.ProductUpdatedEventV1;
 import com.banreservas.product.messaging.ProductEventPublisher;
 import com.banreservas.product.model.Product;
@@ -20,6 +21,8 @@ public class ProductEventPublishServiceImpl implements ProductEventPublishServic
 
     private final ProductEventPublisher<ProductUpdatedEventV1> productUpdatedEventPublisher;
 
+    private final ProductEventPublisher<ProductDeletedEventV1> productDeletedEventPublisher;
+
     @Override
     public Mono<Product> sendProductCreatedEvent(Product product) {
 
@@ -37,6 +40,14 @@ public class ProductEventPublishServiceImpl implements ProductEventPublishServic
                 .flatMap(event -> productUpdatedEventPublisher.send(product.getId(), event))
                 .map(SendResult::getProducerRecord)
                 .map(producerRecord -> PRODUCT_EVENT_MAPPER.toProduct(producerRecord.value()));
+    }
+
+    @Override
+    public Mono<Void> sendProductDeletedEvent(Product product) {
+        return productDeletedEventPublisher.send(product.getId(), ProductDeletedEventV1.newBuilder()
+                        .setId(product.getId())
+                        .build())
+                .then();
     }
 
 

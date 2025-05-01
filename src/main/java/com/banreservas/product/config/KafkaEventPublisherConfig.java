@@ -1,6 +1,7 @@
 package com.banreservas.product.config;
 
 import com.banreservas.product.avro.v1.ProductCreatedEventV1;
+import com.banreservas.product.avro.v1.ProductDeletedEventV1;
 import com.banreservas.product.avro.v1.ProductUpdatedEventV1;
 import com.banreservas.product.messaging.ProductEventPublisher;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -25,6 +26,14 @@ public class KafkaEventPublisherConfig {
             KafkaTemplate<String, ProductUpdatedEventV1> kafkaTemplate, KafkaBindingsProperties kafkaBindingsProperties) {
 
         var topic = kafkaBindingsProperties.getTopics().get(ProductUpdatedEventV1.class.getCanonicalName());
+        return new ProductEventPublisher<>(kafkaTemplate, topic);
+    }
+
+    @Bean
+    public ProductEventPublisher<ProductDeletedEventV1> productDeletedEventPublisher(
+            KafkaTemplate<String, ProductDeletedEventV1> kafkaTemplate, KafkaBindingsProperties kafkaBindingsProperties) {
+
+        var topic = kafkaBindingsProperties.getTopics().get(ProductDeletedEventV1.class.getCanonicalName());
         return new ProductEventPublisher<>(kafkaTemplate, topic);
     }
 }
