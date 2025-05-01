@@ -48,6 +48,14 @@ public class ProductController implements ProductsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Flux<ProductResponseDto>>> getProductByCategory(String category, String currency, ServerWebExchange exchange) {
+        Flux<ProductResponseDto> result = productService.listByCategory(category)
+                .doOnNext(product -> log.trace("List Products by Category: [{}]", category))
+                .map(MAPPER::toProductDto);
+        return Mono.just(ResponseEntity.ok(result));
+    }
+
+    @Override
     public Mono<ResponseEntity<ProductResponseDto>> updateProduct(String id, @Valid ProductRequestDto productRequestDto, ServerWebExchange exchange) {
         return productService.getOne(id)
                 .switchIfEmpty(Mono.error(new ProductNotFoundException(id)))

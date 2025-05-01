@@ -162,6 +162,34 @@ paths:
                 code: 404
                 title: "resource-not-found"
                 detail: "The resource can't be found"
+  /products/category/{category}:
+    get:
+      summary: List all products by Category
+      operationId: getProductByCategory
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+          description: Product category
+        - in: query
+          name: currency
+          schema:
+            type: string
+          required: false
+          description: Currency code to convert product price (example DOP, EUR, USD)
+      responses:
+        '200':
+          description: List of products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
 components:
   schemas:
     ProductRequest:
