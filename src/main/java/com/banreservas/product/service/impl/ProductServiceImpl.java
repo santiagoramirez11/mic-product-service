@@ -51,4 +51,9 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.delete(product)
                 .then(productEventPublishService.sendProductDeletedEvent(product));
     }
+
+    @Override
+    public Flux<Product> listByCategory(String category) {
+        return productRepository.findAllByCategory(category);
+    }
 }

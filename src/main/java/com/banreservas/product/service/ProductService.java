@@ -15,4 +15,6 @@ public interface ProductService {
     Mono<Product> updateProduct(Product dbProduct, Product newProductChanges);
 
     Mono<Void> deleteProduct(Product product);
+
+    Flux<Product> listByCategory(String category);
 }

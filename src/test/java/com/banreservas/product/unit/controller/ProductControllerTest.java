@@ -12,8 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.Objects;
 
 import static com.banreservas.product.util.JsonUtils.readFile;
 import static com.banreservas.product.util.JsonUtils.toObject;
@@ -96,5 +99,25 @@ class ProductControllerTest {
 
         StepVerifier.create(productController.deleteProduct(productId, serverWebExchange))
                 .verifyError(ProductNotFoundException.class);
+    }
+
+    @Test
+    void ProductController_GetProductByCategory_ShouldReturnsProduct() {
+        var category = "electronics";
+        var product = toObject(readFile("/controller/product-expected.json"), Product.class);
+        var expectedResponse = toObject(readFile("/controller/product-expected.json"), com.banreservas.openapi.models.ProductResponseDto.class);
+
+        when(productService.listByCategory(anyString())).thenReturn(Flux.just(product));
+
+        StepVerifier.create(productController.getProductByCategory(category, null, serverWebExchange))
+                .expectNextMatches(response -> {
+                    var body = response.getBody();
+                    if (body == null || HttpStatus.OK != response.getStatusCode()) {
+                        return false;
+                    }
+
+                    return Objects.requireNonNull(body.collectList().block()).contains(expectedResponse);
+                })
+                .verifyComplete();
     }
 }
