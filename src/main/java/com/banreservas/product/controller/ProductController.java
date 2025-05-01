@@ -61,6 +61,11 @@ public class ProductController implements ProductsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> deleteProduct(String id, ServerWebExchange exchange) {
-        throw new ProductNotFoundException(id);
+        return productService.getOne(id)
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(id)))
+                .doOnNext(product -> log.trace("Deleting Product: [ProductFound: {}]", product))
+                .flatMap(productService::deleteProduct)
+                .doOnSuccess(l -> log.info("Success delete product [id: {}]", id))
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
 }

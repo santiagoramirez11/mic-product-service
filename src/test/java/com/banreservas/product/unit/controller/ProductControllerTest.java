@@ -74,4 +74,27 @@ class ProductControllerTest {
         StepVerifier.create(productController.updateProduct(productId, productRequestDto, serverWebExchange))
                 .verifyError(ProductNotFoundException.class);
     }
+
+    @Test
+    void ProductController_DeleteProduct_ShouldReturnsNotContent() {
+        var productId = "68110d3751d1f7328efa0ece";
+        var product = toObject(readFile("/controller/product-expected.json"), Product.class);
+
+        when(productService.getOne(anyString())).thenReturn(Mono.just(product));
+        when(productService.deleteProduct(any(Product.class))).thenReturn(Mono.empty());
+
+        StepVerifier.create(productController.deleteProduct(productId, serverWebExchange))
+                .expectNext(ResponseEntity.noContent().build())
+                .verifyComplete();
+    }
+
+    @Test
+    void ProductController_DeleteProduct_ShouldThrowProductNotFoundException_WhenProductNotFound() {
+        var productId = "68110d3751d1f7328efa0ece";
+
+        when(productService.getOne(anyString())).thenReturn(Mono.empty());
+
+        StepVerifier.create(productController.deleteProduct(productId, serverWebExchange))
+                .verifyError(ProductNotFoundException.class);
+    }
 }
