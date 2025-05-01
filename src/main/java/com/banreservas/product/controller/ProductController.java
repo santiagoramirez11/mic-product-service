@@ -3,7 +3,6 @@ package com.banreservas.product.controller;
 import com.banreservas.openapi.controllers.ProductsApi;
 import com.banreservas.openapi.models.ProductRequestDto;
 import com.banreservas.openapi.models.ProductResponseDto;
-import com.banreservas.product.constant.Endpoint;
 import com.banreservas.product.exception.ProductNotFoundException;
 import com.banreservas.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -22,7 +21,7 @@ import static com.banreservas.product.mapper.ProductDtoMapper.MAPPER;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(Endpoint.API_BASE)
+@RequestMapping("${app.api.base-url}")
 public class ProductController implements ProductsApi {
 
     private final ProductService productService;

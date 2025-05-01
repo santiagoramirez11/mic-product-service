@@ -29,6 +29,8 @@ spring:
         '[schema.registry.url]': http://localhost:8081
         '[specific.avro.reader]': true
 app:
+  api:
+    base-url: /api/v1
   bindings:
     topics:
       '[com.banreservas.product.avro.v1.ProductCreatedEventV1]': product-created-v1
