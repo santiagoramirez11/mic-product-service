@@ -36,3 +36,10 @@ app:
       '[com.banreservas.product.avro.v1.ProductCreatedEventV1]': product-created-v1
       '[com.banreservas.product.avro.v1.ProductUpdatedEventV1]': product-updated-v1
       '[com.banreservas.product.avro.v1.ProductDeletedEventV1]': product-deleted-v1
+  service:
+    default-currency: DOP
+
+external:
+  exchange-rate-api:
+    key: 9120c6a502716521e8984bd8
+    base-url: https://v6.exchangerate-api.com

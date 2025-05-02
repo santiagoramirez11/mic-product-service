@@ -3,6 +3,7 @@ package com.banreservas.product.unit.controller;
 import com.banreservas.product.controller.ProductController;
 import com.banreservas.product.exception.ProductNotFoundException;
 import com.banreservas.product.model.Product;
+import com.banreservas.product.service.ProductPriceService;
 import com.banreservas.product.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +36,9 @@ class ProductControllerTest {
 
     @Mock
     private ServerWebExchange serverWebExchange;
+
+    @Mock
+    private ProductPriceService productPriceService;
 
 
     @Test
@@ -108,8 +112,10 @@ class ProductControllerTest {
         var expectedResponse = toObject(readFile("/controller/product-expected.json"), com.banreservas.openapi.models.ProductResponseDto.class);
 
         when(productService.listByCategory(anyString())).thenReturn(Flux.just(product));
+        when(productPriceService.getProductWithCurrencyChanged(any(Product.class), anyString()))
+                .thenReturn(Mono.just(product));
 
-        StepVerifier.create(productController.getProductByCategory(category, null, serverWebExchange))
+        StepVerifier.create(productController.getProductByCategory(category, "DOP", serverWebExchange))
                 .expectNextMatches(response -> {
                     var body = response.getBody();
                     if (body == null || HttpStatus.OK != response.getStatusCode()) {

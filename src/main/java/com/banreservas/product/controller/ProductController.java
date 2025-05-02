@@ -4,6 +4,7 @@ import com.banreservas.openapi.controllers.ProductsApi;
 import com.banreservas.openapi.models.ProductRequestDto;
 import com.banreservas.openapi.models.ProductResponseDto;
 import com.banreservas.product.exception.ProductNotFoundException;
+import com.banreservas.product.service.ProductPriceService;
 import com.banreservas.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import static com.banreservas.product.mapper.ProductDtoMapper.MAPPER;
 public class ProductController implements ProductsApi {
 
     private final ProductService productService;
+
+    private final ProductPriceService productPriceService;
 
     @Override
     public Mono<ResponseEntity<Flux<ProductResponseDto>>> listProducts(String currency, ServerWebExchange exchange) {
@@ -51,6 +54,7 @@ public class ProductController implements ProductsApi {
     public Mono<ResponseEntity<Flux<ProductResponseDto>>> getProductByCategory(String category, String currency, ServerWebExchange exchange) {
         Flux<ProductResponseDto> result = productService.listByCategory(category)
                 .doOnNext(product -> log.trace("List Products by Category: [{}]", category))
+                .flatMap(product -> productPriceService.getProductWithCurrencyChanged(product, currency))
                 .map(MAPPER::toProductDto);
         return Mono.just(ResponseEntity.ok(result));
     }
