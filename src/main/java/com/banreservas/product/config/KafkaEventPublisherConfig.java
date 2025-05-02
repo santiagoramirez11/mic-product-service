@@ -3,6 +3,7 @@ package com.banreservas.product.config;
 import com.banreservas.product.avro.v1.ProductCreatedEventV1;
 import com.banreservas.product.avro.v1.ProductDeletedEventV1;
 import com.banreservas.product.avro.v1.ProductUpdatedEventV1;
+import com.banreservas.product.config.properties.KafkaBindingsProperties;
 import com.banreservas.product.messaging.ProductEventPublisher;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;

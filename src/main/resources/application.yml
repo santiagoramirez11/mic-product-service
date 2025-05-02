@@ -36,6 +36,25 @@ app:
       '[com.banreservas.product.avro.v1.ProductCreatedEventV1]': product-created-v1
       '[com.banreservas.product.avro.v1.ProductUpdatedEventV1]': product-updated-v1
       '[com.banreservas.product.avro.v1.ProductDeletedEventV1]': product-deleted-v1
+
+  security:
+    admin:
+      username: admin
+      password: admin123
+    roles:
+      - USER
+      - ADMIN
+    rules:
+      - path: /api/v1/products
+        method: GET
+        roles: [ USER, ADMIN ]
+      - path: /api/v1/products
+        method: POST
+        roles: [ ADMIN ]
+    token:
+      secret: testing-secret-passwordtesting-secret-passwordtesting-secret-password
+      expiration-time: 3600000
+
   service:
     default-currency: DOP
 
