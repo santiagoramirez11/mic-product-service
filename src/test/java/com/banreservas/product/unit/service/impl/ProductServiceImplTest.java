@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -77,5 +78,42 @@ class ProductServiceImplTest {
         StepVerifier.create(productService.getOne(productId))
                 .expectNext(product)
                 .verifyComplete();
+    }
+
+    @Test
+    void ProductService_ListByCategory_Success() {
+        var product = toObject(readFile("/service/product-expected.json"), Product.class);
+        var fluxProduct = Flux.just(product);
+
+        when(productRepository.findAllByCategory(anyString())).thenReturn(fluxProduct);
+
+        var category = "Monitor";
+        StepVerifier.create(productService.listByCategory(category))
+                .expectNextMatches(product::equals)
+                .verifyComplete();
+    }
+
+    @Test
+    void ProductService_GetAll_Success() {
+        var product = toObject(readFile("/service/product-expected.json"), Product.class);
+        var fluxProduct = Flux.just(product);
+
+        when(productRepository.findAll()).thenReturn(fluxProduct);
+
+        StepVerifier.create(productService.getAll())
+                .expectNextMatches(product::equals)
+                .verifyComplete();
+    }
+
+    @Test
+    void ProductService_Delete_Success() {
+        var product = toObject(readFile("/service/product-expected.json"), Product.class);
+
+        when(productRepository.delete(any(Product.class))).thenReturn(Mono.empty());
+        when(productEventPublishService.sendProductDeletedEvent(any(Product.class))).thenReturn(Mono.empty());
+
+        StepVerifier.create(productService.deleteProduct(product))
+                .verifyComplete();
+
     }
 }
