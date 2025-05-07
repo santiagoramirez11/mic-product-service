@@ -18,6 +18,8 @@ Microservice for product management in the stock system. Built with Spring Boot 
 - OpenAPI 3 (Swagger UI)
 - MapStruct
 
+See more about it in **[Technology Justification](docs/technologies.md)**
+
 ---
 
 ## 📚 Project Architecture
