@@ -1,4 +1,4 @@
-package com.banreservas.product.config;
+package com.banreservas.product.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
