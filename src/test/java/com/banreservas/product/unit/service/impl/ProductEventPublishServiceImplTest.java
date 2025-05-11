@@ -8,36 +8,37 @@ import com.banreservas.product.model.Product;
 import com.banreservas.product.service.impl.ProductEventPublishServiceImpl;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.support.SendResult;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
 
 import static com.banreservas.product.util.JsonUtils.readFile;
 import static com.banreservas.product.util.JsonUtils.toObject;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
-@ExtendWith(MockitoExtension.class)
 class ProductEventPublishServiceImplTest {
 
-    @InjectMocks
-    private ProductEventPublishServiceImpl productEventPublishService;
+    private final ProductEventPublishServiceImpl productEventPublishService;
 
-    @Mock
-    private ProductEventPublisher<ProductCreatedEventV1> productCreatedEventPublisher;
+    private final ProductEventPublisher<ProductCreatedEventV1> productCreatedEventPublisher;
 
-    @Mock
-    private ProductEventPublisher<ProductUpdatedEventV1> productUpdatedEventPublisher;
+    private final ProductEventPublisher<ProductUpdatedEventV1> productUpdatedEventPublisher;
 
-    @Mock
-    private ProductEventPublisher<ProductDeletedEventV1> productDeletedEventPublisher;
+    private final ProductEventPublisher<ProductDeletedEventV1> productDeletedEventPublisher;
+
+
+    @SuppressWarnings("unchecked")
+    public ProductEventPublishServiceImplTest() {
+        this.productCreatedEventPublisher = Mockito.mock(ProductEventPublisher.class);
+        this.productUpdatedEventPublisher = Mockito.mock(ProductEventPublisher.class);
+        this.productDeletedEventPublisher = Mockito.mock(ProductEventPublisher.class);
+        this.productEventPublishService = new ProductEventPublishServiceImpl(
+                productCreatedEventPublisher,
+                productUpdatedEventPublisher,
+                productDeletedEventPublisher);
+    }
 
     @Test
     void ProductEventPublishService_sendProductCreatedEvent_Success() {
@@ -50,9 +51,7 @@ class ProductEventPublishServiceImplTest {
 
         Mockito.when(productCreatedEventPublisher.send(anyString(), any(ProductCreatedEventV1.class))).thenReturn(Mono.just(sendResult));
 
-        //TODO Mejorar el test
         StepVerifier.create(productEventPublishService.sendProductCreatedEvent(product))
-                .thenAwait(Duration.ofSeconds(4))
                 .expectNext(product)
                 .verifyComplete();
     }
@@ -68,16 +67,27 @@ class ProductEventPublishServiceImplTest {
 
         Mockito.when(productUpdatedEventPublisher.send(anyString(), any(ProductUpdatedEventV1.class))).thenReturn(Mono.just(sendResult));
 
-        //TODO Mejorar el test
         StepVerifier.create(productEventPublishService.sendProductUpdatedEvent(product))
-                .thenAwait(Duration.ofSeconds(4))
                 .expectNext(product)
                 .verifyComplete();
     }
 
     @Test
     void ProductEventPublishService_sendProductDeletedEvent_Success() {
+        var product = toObject(readFile("/service/product-expected.json"), Product.class);
+        var productDeletedEventV1 = ProductDeletedEventV1.newBuilder()
+                .setId(product.getId())
+                .build();
 
+        final var producerRecord = new ProducerRecord<>("deleteTopic", productDeletedEventV1.getId(), productDeletedEventV1);
+        final var sendResult = new SendResult<>(producerRecord, null);
+
+        Mockito.when(productDeletedEventPublisher.send(anyString(), any(ProductDeletedEventV1.class)))
+                .thenReturn(Mono.just(sendResult));
+
+        StepVerifier.create(productEventPublishService.sendProductDeletedEvent(product))
+                .verifyComplete();
+
+        Mockito.verify(productDeletedEventPublisher).send(product.getId(), productDeletedEventV1);
     }
-
 }

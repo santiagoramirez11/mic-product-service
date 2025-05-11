@@ -43,11 +43,6 @@ public class ProductController implements ProductsApi {
                 .doOnNext(productPriceHistory -> log.trace("Getting product Price [{}]", productPriceHistory.getId()))
                 .flatMapMany(productPriceService::getProductPriceHistory)
                 .map(ProductPriceMapper.PRICE_MAPPER::toProductPriceItem);
-//        Disposable subscribe = productService.getOne(productId)
-//                .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
-//                .doOnNext(productPriceHistory -> log.trace("Getting product Price [{}]", productPriceHistory.getId()))
-//                .flatMapMany(productPriceService::getProductPriceHistory)
-//                .map(ProductPriceMapper.PRICE_MAPPER::toProductPriceItem).subscribe();
 
         return Mono.just(results)
                 .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
