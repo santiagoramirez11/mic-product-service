@@ -1,9 +1,11 @@
 package com.banreservas.product.controller;
 
 import com.banreservas.openapi.controllers.ProductsApi;
+import com.banreservas.openapi.models.ProductPriceHistoryItemDto;
 import com.banreservas.openapi.models.ProductRequestDto;
 import com.banreservas.openapi.models.ProductResponseDto;
 import com.banreservas.product.exception.ProductNotFoundException;
+import com.banreservas.product.mapper.ProductPriceMapper;
 import com.banreservas.product.service.ProductPriceService;
 import com.banreservas.product.service.ProductService;
 import jakarta.validation.Valid;
@@ -35,6 +37,19 @@ public class ProductController implements ProductsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Flux<ProductPriceHistoryItemDto>>> productPriceHistory(String productId, ServerWebExchange exchange) {
+        Flux<ProductPriceHistoryItemDto> results = productService.getOne(productId)
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
+                .doOnNext(productPriceHistory -> log.trace("Getting product Price [{}]", productPriceHistory.getId()))
+                .flatMapMany(productPriceService::getProductPriceHistory)
+                .map(ProductPriceMapper.PRICE_MAPPER::toProductPriceItem);
+
+        return Mono.just(results)
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(productId)))
+                .map(ResponseEntity::ok);
+    }
+
+    @Override
     public Mono<ResponseEntity<ProductResponseDto>> createProduct(@Valid ProductRequestDto productRequestDto, ServerWebExchange exchange) {
         return Mono.just(productRequestDto)
                 .map(MAPPER::toProduct)
@@ -47,7 +62,13 @@ public class ProductController implements ProductsApi {
 
     @Override
     public Mono<ResponseEntity<ProductResponseDto>> getProduct(String id, String currency, ServerWebExchange exchange) {
-        throw new ProductNotFoundException(id);
+        return productService.getOne(id)
+                .doOnNext(product -> log.trace("Searching Product: [{}]", id))
+                .switchIfEmpty(Mono.error(new ProductNotFoundException(id)))
+                .flatMap(product -> productPriceService.getProductWithCurrencyChanged(product, currency))
+                .doOnSuccess(response -> log.debug("Success searching Product: [{}:{}]", response.getId(), response.getName()))
+                .map(MAPPER::toProductDto)
+                .map(ResponseEntity::ok);
     }
 
     @Override

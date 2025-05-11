@@ -1,8 +1,11 @@
 package com.banreservas.product.unit.controller;
 
+import com.banreservas.openapi.models.ProductPriceHistoryItemDto;
+import com.banreservas.openapi.models.ProductResponseDto;
 import com.banreservas.product.controller.ProductController;
 import com.banreservas.product.exception.ProductNotFoundException;
 import com.banreservas.product.model.Product;
+import com.banreservas.product.model.ProductPriceHistory;
 import com.banreservas.product.service.ProductPriceService;
 import com.banreservas.product.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -109,7 +112,8 @@ class ProductControllerTest {
     void ProductController_GetProductByCategory_ShouldReturnsProduct() {
         var category = "electronics";
         var product = toObject(readFile("/controller/product-expected.json"), Product.class);
-        var expectedResponse = toObject(readFile("/controller/product-expected.json"), com.banreservas.openapi.models.ProductResponseDto.class);
+        var expectedResponse = toObject(readFile("/controller/product-expected.json"), ProductResponseDto.class);
+
 
         when(productService.listByCategory(anyString())).thenReturn(Flux.just(product));
         when(productPriceService.getProductWithCurrencyChanged(any(Product.class), anyString()))
@@ -125,5 +129,54 @@ class ProductControllerTest {
                     return Objects.requireNonNull(body.collectList().block()).contains(expectedResponse);
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    void ProductController_ProductPriceHistory_ShouldReturnsListOfPriceHistory() {
+        var productId = "68110d3751d1f7328efa0ece";
+        var product = toObject(readFile("/controller/product-expected.json"), Product.class);
+        var productPriceHistory = toObject(readFile("/controller/product-price-expected.json"), ProductPriceHistory.class);
+        var productPriceHistoryExpected = toObject(readFile("/controller/product-price-expected.json"), ProductPriceHistoryItemDto.class);
+
+        when(productService.getOne(anyString())).thenReturn(Mono.just(product));
+        when(productPriceService.getProductPriceHistory(any(Product.class)))
+                .thenReturn(Flux.just(productPriceHistory));
+
+        StepVerifier.create(productController.productPriceHistory(productId, serverWebExchange))
+                .expectNextMatches(response -> {
+                    var body = response.getBody();
+                    if (body == null || HttpStatus.OK != response.getStatusCode()) {
+                        return false;
+                    }
+
+                    return Objects.requireNonNull(body.collectList().block()).contains(productPriceHistoryExpected);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void ProductController_GetProduct_ShouldReturnsProduct() {
+        var product = toObject(readFile("/controller/product-expected.json"), Product.class);
+        var expectedResponse = toObject(readFile("/controller/product-expected.json"), com.banreservas.openapi.models.ProductResponseDto.class);
+
+        var productId = "68110d3751d1f7328efa0ece";
+
+        when(productService.getOne(anyString())).thenReturn(Mono.just(product));
+        when(productPriceService.getProductWithCurrencyChanged(any(Product.class), anyString()))
+                .thenReturn(Mono.just(product));
+
+        StepVerifier.create(productController.getProduct(productId, "USD", serverWebExchange))
+                .expectNext(ResponseEntity.ok(expectedResponse))
+                .verifyComplete();
+    }
+
+    @Test
+    void ProductController_GetProduct_ShouldThrowProductNotFoundException_WhenProductNotFound() {
+        var productId = "68110d3751d1f7328efa0ece";
+
+        when(productService.getOne(anyString())).thenReturn(Mono.empty());
+
+        StepVerifier.create(productController.getProduct(productId, null, serverWebExchange))
+                .verifyError(ProductNotFoundException.class);
     }
 }
