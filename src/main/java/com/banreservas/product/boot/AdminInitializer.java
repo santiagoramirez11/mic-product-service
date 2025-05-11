@@ -23,10 +23,16 @@ public class AdminInitializer implements CommandLineRunner {
 
     private final SecurityProperties securityProperties;
 
+    private final static String ACTUATOR_USERNAME = "-actuator";
+
     @Override
     public void run(String... args) {
         userRepository.findByUsername(securityProperties.getAdmin().username())
                 .switchIfEmpty(createAdminUser())
+                .subscribe();
+
+        userRepository.findByUsername(securityProperties.getAdmin().username() + ACTUATOR_USERNAME)
+                .switchIfEmpty(createActuatorUser())
                 .subscribe();
     }
 
@@ -43,5 +49,20 @@ public class AdminInitializer implements CommandLineRunner {
 
         return userRepository.save(adminUser)
                 .doOnSuccess(user -> log.info("Admin user created: [{}] ", user.getUsername()));
+    }
+
+    private Mono<User> createActuatorUser() {
+        if (!securityProperties.getRoles().contains("ACTUATOR")) {
+            return Mono.error(new IllegalStateException("The role ACTUATOR is not configured in allowed roles"));
+        }
+
+        User actuatorUser = User.builder()
+                .username(securityProperties.getAdmin().username() + ACTUATOR_USERNAME)
+                .password(passwordEncoder.encode(securityProperties.getAdmin().password()))
+                .roles(Set.of("ACTUATOR"))
+                .build();
+
+        return userRepository.save(actuatorUser)
+                .doOnSuccess(user -> log.info("Actuator user created: [{}] ", user.getUsername()));
     }
 }
