@@ -67,6 +67,7 @@ public class SecurityConfig {
                                 .hasAnyRole(roles.toArray(new String[0]));
                     });
                     authorizeExchange.pathMatchers(baseUrl+"/auth/login").permitAll()
+                            .pathMatchers("/actuator/health").permitAll()
                             .anyExchange().authenticated();
                 })
                 .build();
