@@ -265,7 +265,35 @@ public class ProductSystemEndToEndTest extends MicProductServiceApplicationTests
         Assertions.assertThat(responseBody).usingRecursiveComparison().ignoringFields("price").isEqualTo(productResponseDtoExpected);
     }
 
+    @Test
     @Order(9)
+    void ProductService_whenListProducts_thenSuccess() {
+        Product productSaved = productRepository.save(Product.builder()
+                .name("Screen protector")
+                .sku("00003400574")
+                .category("Smartphone")
+                .description("Safe screen protector")
+                .price(500d)
+                .build()).block();
+
+        List<ProductResponseDto> expectedResponse = productRepository.findAll()
+                .map(ProductDtoMapper.MAPPER::toProductDto)
+                .collectList()
+                .block();
+
+
+        client.get()
+                .uri("/api/v1/products", Objects.requireNonNull(productSaved).getCategory())
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", tokenHeader)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(ProductResponseDto.class)
+                .isEqualTo(Objects.requireNonNull(expectedResponse));
+    }
+
+    @Order(10)
     @ParameterizedTest
     @ValueSource(strings = {"/api/v1/products/{productId}"})
     void StockService_whenGetProduct_thenProductNotFound(String endpoint) {
