@@ -1,14 +1,12 @@
 services:
   mongodb:
     image: mongodb/mongodb-community-server:latest
-    container_name: mongodb
     ports:
       - "27017:27017"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zookeeper
-    container_name: zookeeper
     ports:
       - "2181:2181"
     environment:
@@ -19,7 +17,6 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka
-    container_name: kafka
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -36,7 +33,6 @@ services:
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.3.2
-    container_name: schema-registry
     hostname: schema-registry
     depends_on:
       - kafka
@@ -45,12 +41,10 @@ services:
       - "8081:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      #SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
       SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,PLAINTEXT_INTERNAL://host.docker.internal:29092
       SCHEMA_REGISTRY_DEBUG: 'true'
   redis:
     image: redis:7.4.3
-    container_name: redis
     ports:
       - "6379:6379"
