@@ -2,12 +2,12 @@ package com.banreservas.product.exception.handler;
 
 import com.banreservas.openapi.models.ErrorResponseDto;
 import com.banreservas.openapi.models.LoginCredentialErrorResponseDto;
-import com.banreservas.product.exception.InvalidLoginException;
 import com.banreservas.product.exception.ProductNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import reactor.core.publisher.Mono;
@@ -23,10 +23,10 @@ public class ApiExceptionHandler {
         return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse));
     }
 
-    @ExceptionHandler(InvalidLoginException.class)
-    public Mono<ResponseEntity<LoginCredentialErrorResponseDto>> handleOnError(final InvalidLoginException exception) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public Mono<ResponseEntity<LoginCredentialErrorResponseDto>> handleOnError(final BadCredentialsException exception) {
         log.debug(exception.getMessage());
-        final LoginCredentialErrorResponseDto errorResponse = new LoginCredentialErrorResponseDto("Invalid credentials.");
+        final LoginCredentialErrorResponseDto errorResponse = new LoginCredentialErrorResponseDto(exception.getMessage());
         return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse));
     }
 
@@ -50,5 +50,4 @@ public class ApiExceptionHandler {
         final ErrorResponseDto errorResponse = new ErrorResponseDto(HttpStatus.SERVICE_UNAVAILABLE.value(), "service-unavailable", "An unexpected error occurred. Please try again later or contact support.");
         return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse));
     }
-
 }
