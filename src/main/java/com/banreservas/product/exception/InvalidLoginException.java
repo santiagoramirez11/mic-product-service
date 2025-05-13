@@ -1,5 +1,10 @@
 package com.banreservas.product.exception;
 
-public class InvalidLoginException extends RuntimeException {
+import org.springframework.security.authentication.BadCredentialsException;
 
+public class InvalidLoginException extends BadCredentialsException {
+
+    public InvalidLoginException(String msg) {
+        super(msg);
+    }
 }

@@ -55,7 +55,7 @@ public class AuthController implements ServiceAuthApi {
     @Override
     public Mono<ResponseEntity<AuthenticationResponseDto>> login(AuthenticationRequestDto authenticationRequestDto, ServerWebExchange exchange) {
         return createToken(authenticationRequestDto)
-                .switchIfEmpty(Mono.error(new InvalidLoginException()))
+                .switchIfEmpty(Mono.error(new InvalidLoginException("Invalid credentials")))
                 .map(UserAuthenticationRequestMapper.AUTHENTICATION_MAPPER::toDto)
                 .map(ResponseEntity::ok);
     }
