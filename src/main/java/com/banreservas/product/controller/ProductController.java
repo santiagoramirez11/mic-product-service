@@ -33,7 +33,11 @@ public class ProductController implements ProductsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<ProductResponseDto>>> listProducts(String currency, ServerWebExchange exchange) {
-        throw new ProductNotFoundException("0");
+        Flux<ProductResponseDto> result = productService.getAll()
+                .doOnNext(product -> log.trace("List Products: [{}]", product))
+                .flatMap(product -> productPriceService.getProductWithCurrencyChanged(product, currency))
+                .map(MAPPER::toProductDto);
+        return Mono.just(ResponseEntity.ok(result));
     }
 
     @Override

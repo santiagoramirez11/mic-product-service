@@ -253,7 +253,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductResponse'
-  /stock/{productId}/price-history:
+  /products/{productId}/price-history:
     get:
       tags:
         - Products
